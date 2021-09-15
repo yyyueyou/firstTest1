@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 通用的css文件 */
+        /* 基本的化 */
+        *{margin:0;padding:0;}
+        a{ text-decoration:none; color:#464646;}
+        img{display:block}
+        ul{list-style:none}
+        body{font-family:Arial;}
+        h1,h2,h3{font-size: 16px;}
+        body{font-family: Arial,'宋体';background-image: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);}                  /* 字体 */
+
+
+
+        #main{width: 600px;height: 500px;border: 1px solid red;position: relative;margin: 100px auto;}
+        #ball{width: 20px;height: 20px;background-color: red;border-radius: 50%;position: absolute;left: 295px;bottom: 20px;}
+        #bat{width: 80px;height: 20px;background-color: black;position: absolute;left: 255px;bottom: 0;}
+        #brick div{width: 98px;height: 30px;border: 1px solid #464646;float: left;background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);}
+    </style>
+    <script>
+        window.onload = function(){
+            var ball = document.getElementById("ball");
+            var speedX = parseInt(Math.random()*4+3);
+            var speedY = -parseInt(Math.random()*4+3);
+            drag("bat");
+            creatBrick(48);
+            setInterval(function(){
+                
+                ball.style.left = speedX+ball.offsetLeft+"px";
+                ball.style.top = speedY+ball.offsetTop+"px";
+                if(ball.offsetLeft<=0||ball.offsetLeft>=578){
+                    speedX=0-speedX;
+                }
+                if(ball.offsetTop<=0||ball.offsetTop>=478){
+                    speedY=0-speedY;
+                }
+            },30)
+        }
+        function drag(node){
+            var bat = document.getElementById(node);
+            bat.onmousedown = function(ev){
+                var e =ev||window.event;
+                var offsetX=e.clientX-bat.offsetLeft;
+                document.onmousemove = function(ev){
+                    var e =ev||window.event;
+                    var t = e.clientX-offsetX;
+                    if(t<=0){
+                        t=0;
+                    }
+                    else if(t>=520){
+                        t=520;
+                    }
+                    bat.style.left = t+"px";
+                }
+            }
+            document.onmouseup = function(){
+                document.onmousemove = null;
+            }
+        }
+        function creatBrick(n){
+            var oBrick = document.getElementById("brick");
+            for(var i=0;i<n;i++){
+                var node = document.createElement("div");
+                oBrick.appendChild(node);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="main">
+        <div id="ball"></div>
+        <div id="bat"></div>
+        <div id="brick">
+        </div>
+    </div>
+</body>
+</html>
