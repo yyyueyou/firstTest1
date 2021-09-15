@@ -14,34 +14,68 @@
         ul{list-style:none}
         body{font-family:Arial;}
         h1,h2,h3{font-size: 16px;}
-        body{font-family: Arial,'宋体';background-image: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);}                  /* 字体 */
+        body{font-family: Arial,'宋体';background-image: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);width: 100%;height: 100%;}                  /* 字体 */
 
 
-
+        button{width: 200px;height: 70px;background-image: linear-gradient(to top, #c471f5 0%, #fa71cd 100%);position: absolute;left: 660px;top: 620px;}
         #main{width: 600px;height: 500px;border: 1px solid red;position: relative;margin: 100px auto;}
-        #ball{width: 20px;height: 20px;background-color: red;border-radius: 50%;position: absolute;left: 295px;bottom: 20px;}
+        #ball{width: 20px;height: 20px;background-color: red;border-radius: 50%;position: absolute;left: 287px;bottom: 20px;}
         #bat{width: 80px;height: 20px;background-color: black;position: absolute;left: 255px;bottom: 0;}
         #brick div{width: 98px;height: 30px;border: 1px solid #464646;float: left;background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);}
     </style>
     <script>
+        var fontsize =document.documentElement.clientWidth/3.75;
+        document.documentElement.style.fontSize = fontsize+"px";;
         window.onload = function(){
             var ball = document.getElementById("ball");
-            var speedX = parseInt(Math.random()*4+3);
-            var speedY = -parseInt(Math.random()*4+3);
-            drag("bat");
+            var bat = document.getElementById("bat");
+            var brick = document.getElementById("brick");
+            var bricks = brick.getElementsByTagName("div");
+            var btn = document.getElementById("btn");
             creatBrick(48);
-            setInterval(function(){
-                
-                ball.style.left = speedX+ball.offsetLeft+"px";
-                ball.style.top = speedY+ball.offsetTop+"px";
-                if(ball.offsetLeft<=0||ball.offsetLeft>=578){
-                    speedX=0-speedX;
+            btn.onmousedown = function(){
+                var speedX = parseInt(Math.random()*4+3);
+                var speedY = -parseInt(Math.random()*4+3);
+                drag("bat");
+                // 修改所有砖块的定位变浮动为绝对定位，不然砖块消除后，后移动补上空缺
+                for(var i=0;i<bricks.length;i++){
+                    bricks[i].style.left = bricks[i].offsetLeft+"px";
+                    bricks[i].style.top = bricks[i].offsetTop+"px";
                 }
-                if(ball.offsetTop<=0||ball.offsetTop>=478){
-                    speedY=0-speedY;
+                for(var i=0;i<bricks.length;i++){
+                    bricks[i].style.position = "absolute";
                 }
-            },30)
+
+                setInterval(function(){
+                    
+                    ball.style.left = speedX+ball.offsetLeft+"px";
+                    ball.style.top = speedY+ball.offsetTop+"px";
+                    if(ball.offsetLeft<=0||ball.offsetLeft>=578){
+                        speedX=0-speedX;
+                    }
+                    if(ball.offsetTop<=0||ball.offsetTop>=478){
+                        speedY=0-speedY;
+                        if(ball.offsetTop>=478){
+                            alert("游戏结束");
+                            window.location.reload();
+                        }
+                    }
+                    if(crash(ball,bat)){
+                        speedY=0-speedY;
+                    }
+                    // 对小球和砖块碰撞进行检测,对所有砖块检测一次
+                    for(var i=0;i<bricks.length;i++){
+                        if(crash(ball,bricks[i])){
+                            speedY*=-1;
+                            brick.removeChild(bricks[i]);
+                            break;                    }
+                    }
+                },30)
+            }
+            
         }
+
+        // 移动底部横杠
         function drag(node){
             var bat = document.getElementById(node);
             bat.onmousedown = function(ev){
@@ -63,6 +97,8 @@
                 document.onmousemove = null;
             }
         }
+
+        // 创建砖块
         function creatBrick(n){
             var oBrick = document.getElementById("brick");
             for(var i=0;i<n;i++){
@@ -70,9 +106,30 @@
                 oBrick.appendChild(node);
             }
         }
+
+        // 判断是否碰撞
+        function crash(node1,node2){
+            var l1 = node1.offsetLeft;
+            var r1 = l1+node1.offsetWidth;
+            var t1 = node1.offsetTop;
+            var b1 = node1.offsetTop+node1.offsetHeight;
+
+            var l2 = node2.offsetLeft;
+            var r2 = l2+node2.offsetWidth;
+            var t2 = node2.offsetTop;
+            var b2 = node2.offsetTop+node2.offsetHeight;
+            
+            if(l2>r1||r2<l1||b1<t2||t1>b2){
+                return false;
+            }else{
+                return true;
+            }
+
+        }
     </script>
 </head>
 <body>
+    <button id="btn">开始游戏</button>
     <div id="main">
         <div id="ball"></div>
         <div id="bat"></div>
